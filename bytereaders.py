@@ -1,18 +1,18 @@
-def readlittleendian(data: list, amount: int = 1):
-    byteslist = data[:amount]
+def readlittleendian(data, offset, amount: int = 1):
+    byteslist = data[offset:amount + offset]
     ret = 0
     for i in range(amount):
         ret += byteslist[i] << 8 * i
     return ret
 
 
-def read8(data: list):
-    return readlittleendian(data)
+def read8(data, offset):
+    return readlittleendian(data, offset)
 
 
-def read16(data: list):
-    return readlittleendian(data, 2)
+def read16(data, offset):
+    return readlittleendian(data, offset, 2)
 
 
-def read32(data: list):
-    return readlittleendian(data, 4)
+def read32(data, offset):
+    return readlittleendian(data, offset, 4)

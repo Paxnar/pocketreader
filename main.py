@@ -1,35 +1,33 @@
-from bytereaders import read8, read16, read32
+import bytereaders
 import consts
+import gamechecker
 
 
-def readfile(path: str):
-    return open(path, 'rb').read()
+class SAV:
+    def __init__(self, path):
+        self.data = open(path, 'rb').read()
+        self.version = gamechecker.gameversionchecker(self.data)
+        self.current_block = self.get_current_block()
+        self.block_offset = consts.sizes[4]['SIZE_2BLOCKS'] * self.current_block
+        self.started_date = bytereaders.read32(self.data, self.block_offset + consts.offsets[4]['HGSS']['STARTED_DATE'])
 
 
-def isgen4sav(data):
-    if len(data) != consts.SIZE_G4_RAW:
-        return False
-
-    def validSequence(data, offset: int):
-        size = read32(data[offset + consts.SIZE_G4_2BLOCKS - 0xC:])
-        # print(size)
-        if size != offset:
-            return False
-        sdk = read32(data[offset - 0x8:])
-        DATE_INT = 0x20060623
-        DATE_KO = 0x20070903
-        return sdk == DATE_INT or sdk == DATE_KO
-
-    if validSequence(data, consts.SIZE_G4_SMALL_DP):
-        return "DP"
-    if validSequence(data, consts.SIZE_G4_SMALL_Pt):
-        return "Pt"
-    if validSequence(data, consts.SIZE_G4_SMALL_HGSS):
-        return 'HGSS'
-
-    return False
+    def get_current_block(self):
+        if self.version == 'HGSS':
+            block1_time = bytereaders.read16(self.data, consts.offsets[4]['HGSS']['TRAINER_PLAYTIME']) * 3600 + \
+                          bytereaders.read8(self.data, consts.offsets[4]['HGSS']['TRAINER_PLAYTIME'] + 2) * 60 + \
+                          bytereaders.read8(self.data, consts.offsets[4]['HGSS']['TRAINER_PLAYTIME'] + 4)
+            block2_time = bytereaders.read16(self.data, consts.sizes[4]['SIZE_2BLOCKS'] +
+                                             consts.offsets[4]['HGSS']['TRAINER_PLAYTIME']) * 3600 + \
+                          bytereaders.read8(self.data, consts.sizes[4]['SIZE_2BLOCKS'] +
+                                            consts.offsets[4]['HGSS']['TRAINER_PLAYTIME'] + 2) * 60 + \
+                          bytereaders.read8(self.data, consts.sizes[4]['SIZE_2BLOCKS'] +
+                                            consts.offsets[4]['HGSS']['TRAINER_PLAYTIME'] + 4)
+            if block1_time > block2_time:
+                self.playtime = block1_time
+                return 0
+            self.playtime = block2_time
+            return 1
 
 
-file = readfile('HG.sav')
-print(isgen4sav(file))
-
+print(SAV('HG.sav').started_date)
