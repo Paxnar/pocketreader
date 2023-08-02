@@ -17,8 +17,9 @@ class SAV:
                                                    self.block_offset + consts.offsets[4][self.version]['STARTED_DATE'])
             self.league_date = bytereaders.read32(self.data,
                                                   self.block_offset + consts.offsets[4][self.version]['LEAGUE_DATE'])
-            self.player_name = self.get_player_name(self.data,
-                                                    self.block_offset + consts.offsets[4][self.version]['TRAINER_NAME'])
+            self.player_name = characters.get_player_name(self.data,
+                                                          self.block_offset + consts.offsets[4][self.version][
+                                                              'TRAINER_NAME'])
             self.gender = bytereaders.read8(self.data,
                                             self.block_offset + consts.offsets[4][self.version]['TRAINER_GENDER'])
 
@@ -40,29 +41,9 @@ class SAV:
 
     def get_current_block(self):
         if self.gen == 4:
-            block1_time = bytereaders.read16(self.data, consts.offsets[4][self.version]['TRAINER_PLAYTIME']) * 3600 + \
-                          bytereaders.read8(self.data, consts.offsets[4][self.version]['TRAINER_PLAYTIME'] + 2) * 60 + \
-                          bytereaders.read8(self.data, consts.offsets[4][self.version]['TRAINER_PLAYTIME'] + 4)
-            block2_time = bytereaders.read16(self.data, consts.sizes[4]['SIZE_2BLOCKS'] +
-                                             consts.offsets[4][self.version]['TRAINER_PLAYTIME']) * 3600 + \
-                          bytereaders.read8(self.data, consts.sizes[4]['SIZE_2BLOCKS'] +
-                                            consts.offsets[4][self.version]['TRAINER_PLAYTIME'] + 2) * 60 + \
-                          bytereaders.read8(self.data, consts.sizes[4]['SIZE_2BLOCKS'] +
-                                            consts.offsets[4][self.version]['TRAINER_PLAYTIME'] + 4)
-            if block1_time > block2_time:
-                self.playtime = block1_time
-                return 0
-            self.playtime = block2_time
-            return 1
-
-    def get_player_name(self, data, offset):
-        name = ''
-        for i in range(8):
-            letter = bytereaders.read16(data, offset + i * 2)
-            if letter == 65535:
-                break
-            name += characters.decodeCharacter(letter)
-        return name
+            block1_savecount = bytereaders.read32(self.data, consts.sizes[4]['HGSS']['SIZE_SMALL'] - 16)
+            block2_savecount = bytereaders.read32(self.data, consts.sizes[4]['HGSS']['SIZE_SMALL'] + 0x40000 - 16)
+            return block1_savecount < block2_savecount
 
     def __repr__(self):
         return f"This is a {self.gen}" \
@@ -71,5 +52,5 @@ class SAV:
                f"{datetime.datetime.fromtimestamp(946684800 + self.started_date)}"
 
 
-savefile = SAV('mist.sav')
+savefile = SAV('HG.sav')
 print(savefile)
