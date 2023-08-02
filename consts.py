@@ -27,7 +27,7 @@ offsets = {4:
         {
             'STARTED_DATE': 0x34,
             'LEAGUE_DATE': 0x3C,
-            'TRAINER_NAME': 0x68,
+            'TRAINER_NAME': 0x64,
             'TRAINER_ID': 0x74,
             'TRAINER_SID': 0x76,
             'TRAINER_MONEY': 0x78,
