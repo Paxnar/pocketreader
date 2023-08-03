@@ -6,13 +6,13 @@ def readlittleendian(data, offset, amount: int = 1):
     return ret
 
 
-def read8(data, offset):
+def read8(data, offset=0):
     return readlittleendian(data, offset)
 
 
-def read16(data, offset):
+def read16(data, offset=0):
     return readlittleendian(data, offset, 2)
 
 
-def read32(data, offset):
+def read32(data, offset=0):
     return readlittleendian(data, offset, 4)

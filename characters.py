@@ -50,11 +50,18 @@ def decodeCharacter(character: int):
              ' ', ' ', ' ', ' ', '°', '_', '＿', '․', '‥', '', '', ''][character]
 
 
-def get_player_name(data, offset):
+def get_player_name(data, offset, gen):
     name = ''
-    for i in range(8):
-        letter = bytereaders.read16(data, offset + i * 2)
-        if letter == 65535:
-            break
-        name += decodeCharacter(letter)
+    if gen == 4:
+        for i in range(8):
+            letter = bytereaders.read16(data, offset + i * 2)
+            if letter == 65535:
+                break
+            name += decodeCharacter(letter)
+    if gen == 5:
+        for i in range(8):
+            letter = bytereaders.read16(data, offset + i * 2)
+            if letter == 65535:
+                break
+            name += chr(letter)
     return name
